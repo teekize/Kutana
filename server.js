@@ -17,12 +17,16 @@ app.use('/peerjs', peerServer);
 app.use("/static", express.static('public'));
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
+  res.render("main");
+})
+
+app.get('/homepage', (req, res) => {
   res.redirect(`/${uuidV4()}`);
 });
 
 app.get('/exit', (req, res) => {
-  res.render('exit');
+  res.render("exit")
 });
 
 app.get('/:room', (req, res) => {
@@ -30,6 +34,7 @@ app.get('/:room', (req, res) => {
 });
 
 io.on('connection', socket => {
+  console.log("imeconnect")
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId);
     socket.to(roomId).broadcast.emit('user-connected', userId);
