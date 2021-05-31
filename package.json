@@ -9,6 +9,9 @@
   "keywords": [],
   "author": "Teeka Elvis",
   "license": "ISC",
+   "engines": {
+    "node": "12.20.1"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "ejs": "^3.1.6",
