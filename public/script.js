@@ -141,7 +141,7 @@ const setStopButton = () => {
 
 const leaveMeeting = () => {
     if (window.confirm("Do you want to leave the meeting?") == true) {
-        window.location.replace('http://localhost:8080/exit');
+        window.location.replace('https://radiant-bayou-06790.herokuapp.com/exit');
         window.close();
     }
 };
