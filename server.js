@@ -1,51 +1,45 @@
-const express =require("express");
+const express = require('express');
+const { v4: uuidV4 } = require('uuid');
+const cors = require('cors');
 
-const app =express();
+const app = express();
+app.use(cors());
 
-const server =require("http").Server(app);
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
+const { ExpressPeerServer } = require('peer');
+const peerServer = ExpressPeerServer(server, {
+  debug: true
+});
 
-const io=require("socket.io")(server)
+app.use('/peerjs', peerServer);
 
-const {v4: uuidv4} = require("uuid")
+app.use("/static", express.static('public'));
+app.set('view engine', 'ejs');
 
-app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.get('/', (req, res) => {
+  res.redirect(`/${uuidV4()}`);
+});
 
+app.get('/exit', (req, res) => {
+  res.render('exit');
+});
 
-app.get("/", (req,res)=>{
-    res.redirect(`/${uuidv4()}`)
-})
-
-app.get("/:room", (req,res)=>{
-    res.render("room", {roomid:req.params.room})
-})
-
-
-// io.on("connection", client=>{
-//     client.on("join-room", (roomid,userid)=>{
-//         // console.log(roomid, userid);
-//         client.join(roomid);
-//         console.log(roomid, userid);
-//         // client.to(roomid).broadcast.emit("user-connected", userid)
-//         client.to(roomid).broadcast.emit('user-connected', userid);
-//     })
-// })
+app.get('/:room', (req, res) => {
+  res.status(200).render('room', { roomId: req.params.room });
+});
 
 io.on('connection', socket => {
-    socket.on('join-room', (roomId, userId) => {
-      socket.join(roomId)
+  socket.on('join-room', (roomId, userId) => {
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit('user-connected', userId);
 
-      console.log(roomId, userId);
-    //   socket.to(roomId).broadcast.emit('user-connected', userId)
-      io.to(roomId).emit("user-connected", userId); 
-    //   socket.on('disconnect', () => {
-    //     socket.to(roomId).broadcast.emit('user-disconnected', userId)
-    //   })
-    })
-  })
+    socket.on('message', message => {
+      // send message to the same room
+      io.to(roomId).emit('createMessage', message);
+    });
 
+  });
+});
 
-
-server.listen(3000, ()=>{
-    console.log(`server imeanza kulisten http://127.0.0.1:3000`)
-})
+server.listen(process.env.PORT || 8080);
