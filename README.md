@@ -1,8 +1,10 @@
 
-### I as a working zoom clone version
+### KUTANA is a video and Chat application for freinds and family.
 
 this project has been made using the following technologies.
 
-1. WebRTC
+1. WebRTC API
 2. WebSockets
 3. Node Js
+4. Express
+
